@@ -1,7 +1,9 @@
+//cs_customer_config参数对象由第三方项目传入
+let baseUrl = cs_customer_config.cs_frontend_host;
 let loaded = false;
-let baseUrl = "http://localhost:8080";
-let staticResourceUrl = baseUrl+'/consult/';
+let staticResourceUrl = baseUrl + '/consult/';
 let csServiceUrl = baseUrl + '/#/customer/';
+let notify = null;
 
 function loadCSS(cssPath) {
     let head = document.getElementsByTagName('HEAD')[0];
@@ -12,7 +14,15 @@ function loadCSS(cssPath) {
     head.appendChild(link);
 }
 
+function loadJs(jsPath) {
+    let head = document.getElementsByTagName('HEAD')[0];
+    let js = document.createElement('script');
+    js.src = jsPath;
+    head.appendChild(js);
+}
+
 function switchPopup () {
+    requestNotificationPermission();
     let consult = document.getElementsByClassName("box")[0];
     let consultStyle = window.getComputedStyle(consult, null);
     let visibility = consultStyle.getPropertyValue("visibility");
@@ -39,12 +49,7 @@ function renderPopup() {
 
     let iframeElement = document.createElement("iframe");
     iframeElement.className = "window";
-    // accountGuid由外部传入
-    if (accountGuid) {
-        iframeElement.src = csServiceUrl + "?accountGuid=" + accountGuid;
-    } else {
-        iframeElement.src = csServiceUrl;
-    }
+    iframeElement.src = csServiceUrl+'?cs_customer_config='+encodeURIComponent(JSON.stringify(cs_customer_config));
     consultBox.appendChild(iframeElement);
     document.body.appendChild(consultBox);
 }
@@ -97,9 +102,54 @@ function listenIframeCallFunction(event) {
     }, false);
 }
 
+function requestNotificationPermission() {
+    if (window.Notification && window.Notification.permission !== 'granted') {
+        window.Notification.requestPermission();
+    }
+}
+
+function createNotification (notification) {
+    if (notify === null) {
+        notify = new Notify({
+            effect: 'scroll', // flash | scroll, Flashing or scrolling
+            interval: 1000,
+            disableFavicon: true,
+        });
+    }
+    notify.setTitle(true);
+    notify.setTitle("[新消息]");
+
+    notify.notify({
+        title: notification.title,
+        body: notification.body,
+        icon: "https://www.goeasy.io/favicon.ico",
+        openurl: "",
+        onclick: function () {
+            window.focus();
+        },
+        onshow: function () {
+            console.log("on show");
+        },
+    });
+}
+
+function clearNotificationTitle() {
+    if (notify) {
+        notify.setTitle();
+    }
+}
+
+function showPopup () {
+    let consult = document.getElementsByClassName("box")[0];
+    if (consult.style.visibility !== "visible") {
+        consult.style.visibility = "visible";
+    }
+}
+
 window.onload = function () {
 
     loadCSS(staticResourceUrl + 'consult.css');
+    loadJs(staticResourceUrl + "notify@2.1.0.min.js");
     buildIcon();
     renderPopup();
     renderMediaPlayer();

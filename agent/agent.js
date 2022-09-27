@@ -1,7 +1,7 @@
-let loaded = false;
-let baseUrl = "https://localhost:8060";
+let baseUrl = cs_agent_config.cs_frontend_host;
 let staticResourceUrl = baseUrl+'/agent/';
 let csServiceUrl = baseUrl + '/#/agent/';
+let notify = null;
 
 function loadCSS(cssPath) {
     let head = document.getElementsByTagName('HEAD')[0];
@@ -12,14 +12,19 @@ function loadCSS(cssPath) {
     head.appendChild(link);
 }
 
+function loadJs(jsPath) {
+    let head = document.getElementsByTagName('HEAD')[0];
+    let js = document.createElement('script');
+    js.src = jsPath;
+    head.appendChild(js);
+}
+
 function switchPopup () {
     let consult = document.getElementsByClassName("box")[0];
-    let consultStyle = window.getComputedStyle(consult, null);
-    let visibility = consultStyle.getPropertyValue("visibility");
-    if (visibility === "visible") {
-        consult.style.setProperty("visibility", "hidden");
+    if (consult.style.visibility === "visible") {
+        consult.style.visibility = "hidden";
     } else {
-        consult.style.setProperty("visibility", "visible");
+        consult.style.visibility = "visible";
     }
 }
 
@@ -39,7 +44,8 @@ function renderPopup() {
 
     let iframeElement = document.createElement("iframe");
     iframeElement.className = "window";
-    iframeElement.src = csServiceUrl;
+    iframeElement.src = csServiceUrl+'?cs_agent_config='+encodeURIComponent(JSON.stringify(cs_agent_config));
+
 
     consultBox.appendChild(iframeElement);
     document.body.appendChild(consultBox);
@@ -93,9 +99,62 @@ function listenIframeCallFunction(event) {
     }, false);
 }
 
+function requestNotificationPermission() {
+    if (window.Notification) {
+        const permission = window.Notification.permission;
+        if (permission === 'denied') {
+            window.alert('通知权限已被拒绝，请前往设置允许通知！');
+        } else if (permission === 'default') {
+            window.Notification.requestPermission();
+        } else if (permission === 'granted') {
+            return
+        }
+    }
+}
+
+function createNotification (notification) {
+    if (notify === null) {
+        notify = new Notify({
+            effect: 'scroll', // flash | scroll, Flashing or scrolling
+            interval: 1000,
+            disableFavicon: true,
+        });
+    }
+    notify.setTitle(true);
+    notify.setTitle("[新消息]");
+
+    notify.notify({
+        title: notification.title,
+        body: notification.body,
+        icon: "https://www.goeasy.io/favicon.ico",
+        openurl: "",
+        onclick: function () {
+            window.focus();
+        },
+        onshow: function () {
+            console.log("on show");
+        },
+    });
+}
+
+function clearNotificationTitle() {
+    if (notify) {
+        notify.setTitle();
+    }
+}
+
+function showPopup () {
+    let consult = document.getElementsByClassName("box")[0];
+    if (consult.style.visibility !== "visible") {
+        consult.style.visibility = "visible";
+    }
+}
+
 window.onload = function () {
 
     loadCSS(staticResourceUrl+"agent.css");
+    loadJs(staticResourceUrl+"notify@2.1.0.min.js");
+    requestNotificationPermission();
     buildIcon();
     renderPopup();
     renderMediaPlayer();

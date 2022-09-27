@@ -12,7 +12,7 @@
     flex-direction: column;
 
     visibility: hidden;
-    box-shadow: 0 0 15px #D02129;
+    box-shadow: 0 10px 25px rgb(0,0,0,0.1);
     background: #fff;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .cs span {
-    margin-top: 70px;
+    margin-top: 74px;
     font-weight: normal;
     font-size: 15px;
     line-height: 22px;
