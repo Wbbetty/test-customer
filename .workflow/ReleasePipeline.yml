@@ -28,8 +28,7 @@ stages:
           - git remote add origin https://${GIT_USER}:${GIT_PASS}@gitee.com/goeasy-io/customer-support-live.git
           - ''
           - '# 清空老数据'
-          - rm -rf !(.workflow|.git)
-          - ''
+          - rm -rf *
           - ''
           - '# 克隆dev仓库,并切换分支'
           - git clone -b dist https://${GIT_USER}:${GIT_PASS}@gitee.com/goeasy-io/customer-support-dev.git
