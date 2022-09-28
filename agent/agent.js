@@ -56,7 +56,7 @@ function renderMediaPlayer () {
     mediaPlayer.className = "media-player";
     let button = document.createElement("span");
     button.className="close-player";
-    button.innerText="关闭"
+    button.innerText="×"
     button.onclick = closeMediaPlayer;
     mediaPlayer.appendChild(button);
     document.body.appendChild(mediaPlayer);
