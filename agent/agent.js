@@ -63,8 +63,11 @@ function renderMediaPlayer () {
 }
 
 function showImage (params) {
-    let image = document.createElement("img");
-    image.className="image-player";
+    let image = document.getElementsByClassName("image-player")[0];
+    if (!image) {
+        image = document.createElement("img");
+        image.className="image-player";
+    }
     image.src = params.url;
     let mediaPlayer = document.getElementsByClassName("media-player")[0];
     mediaPlayer.appendChild(image);
@@ -72,8 +75,11 @@ function showImage (params) {
 }
 
 function showVideo (params) {
-    let video = document.createElement("video");
-    video.className="video-player";
+    let video = document.getElementsByClassName("video-player")[0];
+    if (!video) {
+        video = document.createElement("video");
+        video.className="video-player";
+    }
     video.src = params.url;
     video.setAttribute("controls", "controls");
     video.setAttribute("autoplay", "autoplay");
